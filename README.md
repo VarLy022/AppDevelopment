@@ -1,6 +1,6 @@
 # design_app
 
-A new Flutter project.
+Hello Flutter project.
 
 ## Getting Started
 
