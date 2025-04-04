@@ -12,6 +12,20 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   TextEditingController txtSearch = TextEditingController();
   List data = [];
+  Future<void> fetchSearchData(String bid) async {
+    try {
+      final String urlf = "$url/$bid";
+      final response = await http.get(Uri.parse(urlf));
+      if (response.statusCode == 200) {
+        setState(() {
+          data = json.decode(response.body);
+        });
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   final String url = "http://10.0.2.2:4000/book";
 
   @override
@@ -34,6 +48,7 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   void showBookDialog({String? id, String? name, String? price, String? page}) {
+
     TextEditingController idController = TextEditingController(text: id ?? "");
     TextEditingController nameController =
         TextEditingController(text: name ?? "");
@@ -132,6 +147,62 @@ class _ProductsPageState extends State<ProductsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("ຈັດການຂໍ້ມູນປື້ມ"),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: Container(
+            height: 50,
+            margin: EdgeInsets.all(10),
+            child: TextField(
+              onChanged: (val) {
+                if (txtSearch.text == "" || txtSearch.text == null) {
+                  fetchAllData();
+                } else {
+                  fetchSearchData(txtSearch.text);
+                }
+              },
+              controller: txtSearch,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide(width: 1),
+                ),
+                filled: true,
+                fillColor: Colors.white70,
+                prefixIcon: Icon(
+                  Icons.book_online,
+                  color: Colors.teal,
+                  size: 35,
+                ),
+                labelText: "ຄົ້ນຫາ",
+                suffix: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        txtSearch.clear();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 25,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        fetchSearchData(txtSearch.text);
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       body: data.isEmpty
           ? Center(child: CircularProgressIndicator())
